@@ -1,11 +1,14 @@
 import express from "express";
+import healthRoutes from "./routes/health";
 
+// initializes app through express
 const app = express();
+
+// defines port
 const PORT = 3000;
 
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
-});
+// registers routes
+app.use(healthRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
