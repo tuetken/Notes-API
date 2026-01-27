@@ -11,10 +11,10 @@ const PORT = 3000;
 // middleware to parse json
 app.use(express.json());
 
-// system routes
-app.use(healthRoutes);
+// health check route
+app.use("/health", healthRoutes);
 
-// api routes
+// notes api route
 app.use("/api/notes", notesRoutes);
 
 app.listen(PORT, () => {
