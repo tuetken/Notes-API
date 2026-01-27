@@ -9,6 +9,32 @@ router.get("/", (req, res) => {
   res.status(200).json({ notes });
 });
 
+// GET /api/notes/:id
+router.get("/:id", (req, res) => {
+  // extract id from request
+  const { id } = req.params;
+
+  // copy database and assign to variable
+  const notes = getAllNotes();
+
+  // placeholder variable if note is found
+  let foundNote = null;
+
+  // loop through store
+  for (const note of notes) {
+    if (note.id === id) {
+      foundNote = note;
+      break;
+    }
+  }
+
+  if (!foundNote) {
+    return res.status(400).json({ error: "ID not found" });
+  }
+
+  res.status(200).json({ noteByID });
+});
+
 // POST /api/notes
 router.post("/", (req, res) => {
   const { title, content } = req.body;
