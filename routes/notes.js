@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { getAllNotes, addNote } from "./data/notesStore";
+import { getAllNotes, addNote } from "../data/notesStore.js";
 
 const router = Router();
 
 // GET /api/notes
 router.get("/", (req, res) => {
-  const notes = getAllNotes;
+  const notes = getAllNotes();
   res.status(200).json({ notes });
 });
 
@@ -20,10 +20,10 @@ router.post("/", (req, res) => {
 
   // creates new note object
   const newNote = {
-    id: crypto.randomUUID(),
+    id: randomUUID(),
     title,
     content,
-    createdAt: new Date().toISOString,
+    createdAt: new Date().toISOString(),
   };
 
   // appends to addNote which stores in notes[] "database" (./data/notesStore)
@@ -31,4 +31,4 @@ router.post("/", (req, res) => {
   res.status(201).json(newNote);
 });
 
-export default notesRoutes;
+export default router;

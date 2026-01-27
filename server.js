@@ -1,6 +1,6 @@
 import express from "express";
-import healthRoutes from "./routes/health";
-import notesRoutes from "./routes/notes";
+import healthRoutes from "./routes/health.js";
+import notesRoutes from "./routes/notes.js";
 
 // initializes app through express
 const app = express();
