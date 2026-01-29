@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getAllNotes, addNote } from "../data/notesStore.js";
+import { randomUUID } from "crypto";
 
 const router = Router();
 
@@ -93,6 +94,29 @@ router.put("/:id", (req, res) => {
   }
 
   res.status(200).json(foundNote);
+});
+
+// DELETE api/notes/:id
+router.delete("/:id", (req, res) => {
+  const { id } = req.params;
+  const notes = getAllNotes();
+
+  let foundIndex = -1;
+
+  for (let i = 0; i < notes.length; i++) {
+    if (notes[i].id === id) {
+      foundIndex = i;
+      break;
+    }
+  }
+
+  if (foundIndex === -1) {
+    return res.status(404).json({ error: "ID not found" });
+  }
+
+  notes.splice(foundIndex, 1);
+
+  return res.status(200).json({ message: "Note successfully deleted" });
 });
 
 export default router;
