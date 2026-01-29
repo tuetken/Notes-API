@@ -36,16 +36,49 @@ router.get("/:id", (req, res) => {
   res.status(200).json({ noteByID });
 });
 
-// POST /api/notes
 router.post("/", (req, res) => {
   const { title, content } = req.body;
 
-  // checks for missing title / content
   if (!title || !content) {
     return res.status(400).json({ error: "Requires title and content" });
   }
 
-  // creates new note object
+  const errors = [];
+
+  if (typeof title !== "string") {
+    errors.push({ field: "title", message: "Title must be a string" });
+  } else {
+    const trimmedTitle = title.trim();
+
+    if (trimmedTitle.length === 0) {
+      errors.push({ field: "title", message: "Title must not be empty" });
+    }
+
+    if (trimmedTitle.length > 101) {
+      errors.push({ field: "title", message: "Title must not exceed 100 characters" });
+    }
+  }
+
+  if (typeof content !== "string") {
+    errors.push({ field: "content", message: "Content must be a string" });
+  } else {
+    const contentTrimmed = content.trim();
+
+    if (contentTrimmed.length === 0) {
+      errors.push({ field: "content", message: "Content must not be empty" });
+    }
+
+    if (contentTrimmed.length > 1001) {
+      errors.push({ field: "content", message: "Content must not exceed 1000 characters" });
+    }
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  // ----------------------------- //
+
   const newNote = {
     id: randomUUID(),
     title,
@@ -53,25 +86,21 @@ router.post("/", (req, res) => {
     createdAt: new Date().toISOString(),
   };
 
-  // appends to addNote which stores in notes[] "database" (./data/notesStore)
   addNote(newNote);
   res.status(201).json(newNote);
 });
 
-// PUT /api/notes/:id
 router.put("/:id", (req, res) => {
   const id = req.params.id;
   const notes = getAllNotes();
   const { title, content } = req.body;
 
-  // checks for modifications
   if (!title && !content) {
     res.status(400).json({ error: "At least one field must be modified" });
   }
 
   let foundNote = null;
 
-  // checks for id in notes[]
   for (const note of notes) {
     if (note.id === id) {
       foundNote = note;
@@ -79,12 +108,10 @@ router.put("/:id", (req, res) => {
     }
   }
 
-  // if id doesnt exist
   if (!foundNote) {
     return res.status(404).json({ error: "ID not found" });
   }
 
-  // if id does exist: modify and return
   if (title) {
     foundNote.title = title;
   }
@@ -96,7 +123,6 @@ router.put("/:id", (req, res) => {
   res.status(200).json(foundNote);
 });
 
-// DELETE api/notes/:id
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
   const notes = getAllNotes();
