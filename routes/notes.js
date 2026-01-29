@@ -57,4 +57,42 @@ router.post("/", (req, res) => {
   res.status(201).json(newNote);
 });
 
+// PUT /api/notes/:id
+router.put("/:id", (req, res) => {
+  const id = req.params.id;
+  const notes = getAllNotes();
+  const { title, content } = req.body;
+
+  // checks for modifications
+  if (!title && !content) {
+    res.status(400).json({ error: "At least one field must be modified" });
+  }
+
+  let foundNote = null;
+
+  // checks for id in notes[]
+  for (const note of notes) {
+    if (note.id === id) {
+      foundNote = note;
+      break;
+    }
+  }
+
+  // if id doesnt exist
+  if (!foundNote) {
+    return res.status(404).json({ error: "ID not found" });
+  }
+
+  // if id does exist: modify and return
+  if (title) {
+    foundNote.title = title;
+  }
+
+  if (content) {
+    foundNote.content = content;
+  }
+
+  res.status(200).json(foundNote);
+});
+
 export default router;
