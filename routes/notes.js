@@ -2,6 +2,8 @@ import { Router } from "express";
 import { getAllNotes, addNote } from "../data/notesStore.js";
 import { randomUUID } from "crypto";
 import { validateNote } from "../validation/validateNote.js";
+import { sendError } from "../utils/sendError.js";
+import { sendResponse } from "../utils/sendResponse.js";
 
 const router = Router();
 
@@ -23,17 +25,17 @@ router.get("/:id", (req, res) => {
   }
 
   if (!foundNote) {
-    return res.status(400).json({ error: "ID not found" });
+    sendError(res, 404, "ID not found");
   }
 
-  res.status(200).json({ noteByID });
+  res.status(200).json({ foundNote });
 });
 
 router.post("/", (req, res) => {
   const { title, content } = req.body;
 
   if (!title || !content) {
-    return res.status(400).json({ error: "Requires title and content" });
+    sendError(res, 400, "Requires title and content");
   }
 
   // ==== VALIDATION ==== //
@@ -63,7 +65,7 @@ router.put("/:id", (req, res) => {
   const { title, content } = req.body;
 
   if (!title && !content) {
-    res.status(400).json({ error: "At least one field must be modified" });
+    sendError(res, 400, "At least one field must be modified");
   }
 
   let foundNote = null;
@@ -76,7 +78,7 @@ router.put("/:id", (req, res) => {
   }
 
   if (!foundNote) {
-    return res.status(404).json({ error: "ID not found" });
+    sendError(res, 404, "ID not found");
   }
 
   // ==== VALIDATION ==== //
@@ -113,12 +115,12 @@ router.delete("/:id", (req, res) => {
   }
 
   if (foundIndex === -1) {
-    return res.status(404).json({ error: "ID not found" });
+    sendError(res, 404, "ID not found");
   }
 
   notes.splice(foundIndex, 1);
 
-  return res.status(200).json({ message: "Note successfully deleted" });
+  sendResponse(res, 200, "Note successfully deleted");
 });
 
 export default router;
