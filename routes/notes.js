@@ -25,24 +25,24 @@ router.get("/:id", (req, res) => {
   }
 
   if (!foundNote) {
-    sendError(res, 404, "ID not found");
+    return sendError(res, 404, "ID not found");
   }
 
-  res.status(200).json({ foundNote });
+  return res.status(200).json({ foundNote });
 });
 
 router.post("/", (req, res) => {
   const { title, content } = req.body;
 
   if (!title || !content) {
-    sendError(res, 400, "Requires title and content");
+    return sendError(res, 400, "Requires title and content");
   }
 
   // ==== VALIDATION ==== //
 
   const errors = validateNote({ title, content });
 
-  if (errors > 0) {
+  if (errors.length > 0) {
     return res.status(400).json({ errors });
   }
 
@@ -56,7 +56,7 @@ router.post("/", (req, res) => {
   };
 
   addNote(newNote);
-  res.status(201).json(newNote);
+  return res.status(201).json(newNote);
 });
 
 router.put("/:id", (req, res) => {
@@ -65,7 +65,7 @@ router.put("/:id", (req, res) => {
   const { title, content } = req.body;
 
   if (!title && !content) {
-    sendError(res, 400, "At least one field must be modified");
+    return sendError(res, 400, "At least one field must be modified");
   }
 
   let foundNote = null;
@@ -78,15 +78,15 @@ router.put("/:id", (req, res) => {
   }
 
   if (!foundNote) {
-    sendError(res, 404, "ID not found");
+    return sendError(res, 404, "ID not found");
   }
 
   // ==== VALIDATION ==== //
 
   const errors = validateNote({ title, content });
 
-  if (errors > 0) {
-    res.status(400).json({ errors });
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
   }
 
   // ==== VALIDATION ==== //
@@ -99,7 +99,7 @@ router.put("/:id", (req, res) => {
     foundNote.content = content;
   }
 
-  res.status(200).json(foundNote);
+  return res.status(200).json(foundNote);
 });
 
 router.delete("/:id", (req, res) => {
@@ -115,12 +115,12 @@ router.delete("/:id", (req, res) => {
   }
 
   if (foundIndex === -1) {
-    sendError(res, 404, "ID not found");
+    return sendError(res, 404, "ID not found");
   }
 
   notes.splice(foundIndex, 1);
 
-  sendResponse(res, 200, "Note successfully deleted");
+  return sendResponse(res, 200, "Note successfully deleted");
 });
 
 export default router;

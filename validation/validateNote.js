@@ -11,7 +11,7 @@ export function validateNote({ title, content }) {
         errors.push({ field: "title", message: "Title must not be empty" });
       }
 
-      if (trimmedTitle.length > 101) {
+      if (trimmedTitle.length > 100) {
         errors.push({ field: "title", message: "Title must not exceed 100 characters" });
       }
     }
@@ -27,7 +27,7 @@ export function validateNote({ title, content }) {
         errors.push({ field: "content", message: "Content must not be empty" });
       }
 
-      if (contentTrimmed.length > 1001) {
+      if (contentTrimmed.length > 1000) {
         errors.push({ field: "content", message: "Content must not exceed 1000 characters" });
       }
     }
