@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { validateNote } from "../validation/validateNote.js";
 import { sendError } from "../utils/sendError.js";
 import { sendResponse } from "../utils/sendResponse.js";
+import Note from "./models/Note.js";
 
 const router = Router();
 
@@ -59,14 +60,7 @@ router.post("/", async (req, res) => {
   // ==== VALIDATION ==== //
 
   try {
-    const newNote = {
-      id: randomUUID(),
-      title,
-      content,
-      createdAt: new Date().toISOString(),
-    };
-
-    addNote(newNote);
+    const newNote = await Note.create({ title, content });
     return res.status(201).json(newNote);
   } catch (err) {
     console.error("POST/notes ", err);
