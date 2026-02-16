@@ -1,9 +1,8 @@
 import { Router } from "express";
-import { getAllNotes, addNote } from "../data/notesStore.js";
 import { validateNote } from "../validation/validateNote.js";
 import { sendError } from "../utils/sendError.js";
 import { sendResponse } from "../utils/sendResponse.js";
-import Note from "./models/Note.js";
+import Note from "../models/Note.js";
 
 const router = Router();
 
@@ -22,7 +21,7 @@ router.get("/:id", async (req, res) => {
     const { id } = req.params;
     const note = await Note.findById(id);
 
-    if (!foundNote) {
+    if (!note) {
       return sendError(res, 404, "ID Not Found");
     }
 
@@ -51,8 +50,8 @@ router.post("/", async (req, res) => {
   // ==== VALIDATION ==== //
 
   try {
-    const newNote = await Note.create({ title, content });
-    return res.status(201).json(newNote);
+    const note = await Note.create({ title, content });
+    return res.status(201).json({ note });
   } catch (err) {
     console.error("POST/notes ", err);
     return sendError(res, 500, "Internal Server Error");
@@ -104,21 +103,11 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const notes = getAllNotes();
-    let foundIndex = -1;
+    const note = await Note.findByIdAndDelete(id);
 
-    for (let i = 0; i < notes.length; i++) {
-      if (notes[i].id === id) {
-        foundIndex = i;
-        break;
-      }
-    }
-
-    if (foundIndex === -1) {
+    if (!note) {
       return sendError(res, 404, "ID not found");
     }
-
-    notes.splice(foundIndex, 1);
 
     return sendResponse(res, 200, "Note successfully deleted");
   } catch (err) {
