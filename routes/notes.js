@@ -22,7 +22,7 @@ router.get("/:id", async (req, res) => {
     const { id } = req.params;
     const note = await Note.findById(id);
 
-    if (!note) {
+    if (!foundNote) {
       return sendError(res, 404, "ID Not Found");
     }
 
@@ -61,7 +61,6 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const notes = getAllNotes();
   const { title, content } = req.body;
 
   if (!title && !content) {
@@ -79,28 +78,23 @@ router.put("/:id", async (req, res) => {
   // ==== VALIDATION ==== //
 
   try {
-    let foundNote = null;
+    const note = await Note.findById(id);
 
-    for (const note of notes) {
-      if (note.id === id) {
-        foundNote = note;
-        break;
-      }
-    }
-
-    if (!foundNote) {
+    if (!note) {
       return sendError(res, 404, "ID not found");
     }
 
     if (title !== undefined) {
-      foundNote.title = title;
+      note.title = title;
     }
 
     if (content !== undefined) {
-      foundNote.content = content;
+      note.content = content;
     }
 
-    return res.status(200).json(foundNote);
+    await note.save();
+
+    return res.status(200).json({ note });
   } catch (err) {
     console.error("PUT/notes/:id ", err);
     return sendError(res, 500, "Internal Server Error");
