@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { getAllNotes, addNote } from "../data/notesStore.js";
-import { randomUUID } from "crypto";
 import { validateNote } from "../validation/validateNote.js";
 import { sendError } from "../utils/sendError.js";
 import { sendResponse } from "../utils/sendResponse.js";
@@ -10,32 +9,24 @@ const router = Router();
 
 router.get("/", async (req, res) => {
   try {
-    const notes = getAllNotes();
+    const notes = await Note.find();
     return res.status(200).json({ notes });
   } catch (err) {
     console.error("GET/notes ", err);
-    return sendError(res, 500, "Database Error");
+    return sendError(res, 500, "Internal Server Error");
   }
 });
 
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const notes = getAllNotes();
-    let foundNote = null;
+    const note = await Note.findById(id);
 
-    for (const note of notes) {
-      if (note.id === id) {
-        foundNote = note;
-        break;
-      }
+    if (!note) {
+      return sendError(res, 404, "ID Not Found");
     }
 
-    if (!foundNote) {
-      return sendError(res, 404, "ID not found");
-    }
-
-    return res.status(200).json({ foundNote });
+    return res.status(200).json({ note });
   } catch (err) {
     console.error("GET/notes/:id ", err);
     return sendError(res, 500, "Internal Server Error");
